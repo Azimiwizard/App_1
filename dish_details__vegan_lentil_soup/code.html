@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stitch Design</title>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Epilogue:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#ec7f13",
+              "background-light": "#f8f7f6",
+              "background-dark": "#221910",
+              "content-light": "#333333",
+              "content-dark": "#cccccc"
+            },
+            fontFamily: {
+              "display": ["Epilogue", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-content-light dark:text-content-dark">
+<div class="min-h-screen flex flex-col">
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="container mx-auto px-4">
+<div class="flex items-center justify-between py-4">
+<button class="flex items-center justify-center p-2 -ml-2 rounded-full text-content-light dark:text-content-dark hover:bg-primary/20">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path></svg>
+</button>
+<h1 class="text-xl font-bold text-center flex-grow text-content-light dark:text-content-dark">Menu</h1>
+<div class="w-8"></div> 
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<div class="w-full aspect-[3/2] bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmCkj_wmB0jDZnUGZSUdUAjKbiVeC99mG7XTSQbklqOgQ3lAZ7aLfXmo4JWG2hgVaK0FYjM9lTdIygL_V-19Juvfv2Q29S6Rpjc3WNLB4RuNJqwZdndeuDJ0o_rexb1IymlQYTh3CSoyaa3YIKWDxBwP73Fc8jvmEOn_9Q4qSOCfXxioPITIaXZSbxISVkCQiIiV5xXcIpwpFWWD9EmbawIWZKt3OYdWjTEni9txyT2kzzhwvS_L567lcSqmw13ekOiqC5JRfU8M4");'></div>
+<div class="p-6 space-y-6">
+<div>
+<h2 class="text-3xl font-bold text-content-light dark:text-content-dark">Vegan Lentil Soup</h2>
+<p class="mt-2 text-lg font-semibold text-primary">$8.99</p>
+<p class="mt-2 text-base text-content-light dark:text-content-dark/80">
+                        A hearty and flavorful soup made with red lentils, vegetables, and aromatic spices. This soup is both nutritious and satisfying, perfect for a light lunch or dinner.
+                    </p>
+</div>
+<div class="space-y-4">
+<div>
+<h3 class="text-xl font-bold text-content-light dark:text-content-dark">Ingredients</h3>
+<p class="mt-2 text-base text-content-light dark:text-content-dark/80">
+                            Red lentils, carrots, celery, onions, garlic, vegetable broth, diced tomatoes, cumin, turmeric, coriander, salt, pepper, olive oil.
+                        </p>
+</div>
+<div>
+<h3 class="text-xl font-bold text-content-light dark:text-content-dark">Allergens</h3>
+<p class="mt-2 text-base text-content-light dark:text-content-dark/80">
+                            This dish contains no common allergens.
+                        </p>
+</div>
+</div>
+</div>
+</main>
+<footer class="sticky bottom-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4">
+<div class="container mx-auto">
+<button class="w-full h-14 bg-primary text-white font-bold text-lg rounded-lg shadow-lg hover:bg-primary/90 transition-colors">
+                    Add to Cart
+                </button>
+</div>
+</footer>
+</div>
+
+</body></html>

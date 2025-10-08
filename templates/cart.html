@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="flex flex-col -m-4 min-h-screen justify-between">
+    <main class="flex-grow p-4">
+        <h1 class="text-2xl font-bold mb-6 text-center">Your Cart</h1>
+        {% if items %}
+        <div class="space-y-4">
+            {% for item in items %}
+            <div
+                class="flex items-center bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm transition-shadow hover:shadow-md">
+                <img src="{{ item.dish.image_url }}" alt="{{ item.dish.name }}"
+                    class="w-20 h-20 object-cover rounded-md mr-4">
+                <div class="flex-grow">
+                    <p class="font-bold text-lg">{{ item.dish.name }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">${{ '%.2f'|format(item.dish.price) }}</p>
+                    <p class="font-semibold text-primary mt-1">Subtotal: ${{ '%.2f'|format(item.subtotal) }}</p>
+                </div>
+                <div class="flex flex-col items-end space-y-2">
+                    <form method="post" action="{{ url_for('update_cart_item', cart_item_id=item.cart_item_id) }}"
+                        class="flex items-center">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                            class="w-16 text-center rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 focus:ring-primary focus:border-primary">
+                        <button type="submit"
+                            class="ml-2 p-2 rounded-full hover:bg-primary/10 text-primary transition-colors">
+                            <span class="material-symbols-outlined">sync</span>
+                        </button>
+                    </form>
+                    <form method="post" action="{{ url_for('remove_cart_item', cart_item_id=item.cart_item_id) }}">
+                        <button type="submit"
+                            class="p-2 rounded-full hover:bg-red-500/10 text-red-500 transition-colors">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div
+            class="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md flex justify-between items-center sticky bottom-20">
+            <div>
+                <p class="text-lg font-bold">Total:</p>
+                <p class="text-2xl font-bold text-primary">${{ '%.2f'|format(total) }}</p>
+            </div>
+            <form method="post" action="{{ url_for('checkout') }}">
+                <button type="submit"
+                    class="bg-primary text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-primary/90 transition-colors">
+                    Checkout
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="text-center py-16">
+            <span class="material-symbols-outlined text-6xl text-gray-400">shopping_cart_off</span>
+            <p class="mt-4 text-xl font-semibold text-gray-600 dark:text-gray-300">Your cart is empty.</p>
+            <a href="{{ url_for('menu') }}"
+                class="mt-6 inline-block bg-primary text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-primary/90 transition-colors">
+                Browse Menu
+            </a>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer
+        class="sticky bottom-0 border-t border-background-dark/10 bg-background-light/80 pb-safe dark:border-background-light/10 dark:bg-background-dark/80 backdrop-blur-sm">
+        <nav class="flex justify-around p-2">
+            <a class="flex flex-col items-center justify-center gap-1 rounded-full px-4 py-2 text-background-dark/60 hover:text-primary dark:text-background-light/60 dark:hover:text-primary"
+                href="{{ url_for('menu') }}">
+                <span class="material-symbols-outlined"> restaurant_menu </span>
+                <span class="text-xs font-medium">Menu</span>
+            </a>
+            <a class="flex flex-col items-center justify-center gap-1 rounded-full px-4 py-2 text-primary"
+                href="{{ url_for('cart') }}">
+                <span class="material-symbols-outlined"> shopping_cart </span>
+                <span class="text-xs font-bold">Cart</span>
+            </a>
+            <a class="flex flex-col items-center justify-center gap-1 rounded-full px-4 py-2 text-background-dark/60 hover:text-primary dark:text-background-light/60 dark:hover:text-primary"
+                href="{{ url_for('profile') }}">
+                <span class="material-symbols-outlined"> person </span>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </nav>
+    </footer>
+</div>
+{% endblock %}

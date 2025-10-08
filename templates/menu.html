@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Today's Menu{% endblock %}
+{% block head %}
+{{ super() }}
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Staggered animation delays for dish cards */
+        {
+        % for i in range(1, 11) %
+    }
+
+    .animation-delay- {
+            {
+            i * 100
+        }
+    }
+
+        {
+        animation-delay: {
+                {
+                i * 100
+            }
+        }
+
+        ms;
+    }
+
+        {
+        % endfor %
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="-m-4">
+    <!-- Mobile Menu Panel -->
+    <div id="mobileMenu"
+        class="fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-bold">Categories</h2>
+        </div>
+        <nav class="py-2">
+            {% for section in menu_sections.keys() %}
+            <a href="#section-{{ section|replace(' ', '-')|replace('\'', '') }}"
+                class="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 mobile-menu-link">
+                {{ section }}
+            </a>
+            {% endfor %}
+        </nav>
+    </div>
+    <!-- Backdrop -->
+    <div id="mobileMenuBackdrop" class="fixed inset-0 z-20 bg-black/50 hidden"></div>
+
+    <div class="relative flex h-auto min-h-screen w-full flex-col justify-between overflow-x-hidden">
+        <main class="flex-grow">
+            <header
+                class="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 p-4 pb-3 backdrop-blur-sm dark:bg-background-dark/80">
+                <button id="mobileMenuButton" class="text-background-dark dark:text-background-light">
+                    <span class="material-symbols-outlined text-3xl"> menu </span>
+                </button>
+                <h1 class="text-xl font-bold text-background-dark dark:text-background-light"> Today's Menu </h1>
+                <div class="w-8"></div>
+            </header>
+            <div class="flex flex-col space-y-8 p-4">
+                {# Example: Loop through menu sections and dishes #}
+                {% for section, dishes in menu_sections.items() %}
+                <section id="section-{{ section|replace(' ', '-')|replace('\'', '') }}"
+                    class="opacity-0 animate-fade-in" style="scroll-margin-top: 80px;">
+                    <h2 class="mb-4 text-2xl font-bold text-background-dark dark:text-background-light"> {{ section }}
+                    </h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        {% for dish in dishes %} {# Stagger the animation for each card #}
+                        <div
+                            class="relative group aspect-[3/4] overflow-hidden rounded-xl opacity-0 animate-fade-in animation-delay-{{ (loop.index % 5) * 100 + 100 }}">
+                            <img alt="{{ dish.name }}" class="absolute inset-0 h-full w-full object-cover"
+                                src="{{ dish.image_url }}" loading="lazy" />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3">
+                                <p class="font-bold text-lg text-white">{{ dish.name }}</p>
+                                <p class="font-medium text-sm text-white/80">${{ '%.2f'|format(dish.price) }}</p>
+                            </div>
+                            <div
+                                class="absolute top-2 right-2 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <form method="post" action="{{ url_for('add_to_cart', dish_id=dish.id) }}">
+                                    <button class="p-1.5 bg-black/50 rounded-full" type="submit">
+                                        <span class="material-symbols-outlined text-xl">shopping_cart</span>
+                                    </button>
+                                </form>
+                            </div>
+                            <a class="absolute inset-0" href="{{ url_for('dish_detail', dish_id=dish.id) }}"></a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endfor %}
+            </div>
+        </main>
+        <footer
+            class="sticky bottom-0 border-t border-background-dark/10 bg-background-light/80 pb-safe dark:border-background-light/10 dark:bg-background-dark/80 backdrop-blur-sm">
+            <nav class="flex justify-around p-2">
+                <a class="flex flex-col items-center justify-center gap-1 rounded-full px-4 py-2 text-primary"
+                    href="{{ url_for('menu') }}">
+                    <span class="material-symbols-outlined"> restaurant_menu </span>
+                    <span class="text-xs font-bold">Menu</span>
+                </a>
+                <a class="flex flex-col items-center justify-center gap-1 rounded-full px-4 py-2 text-background-dark/60 hover:text-primary dark:text-background-light/60 dark:hover:text-primary"
+                    href="{{ url_for('cart') }}">
+                    <span class="material-symbols-outlined"> shopping_cart </span>
+                    <span class="text-xs font-medium">Cart</span>
+                </a>
+                <a class="flex flex-col items-center justify-center gap-1 rounded-full px-4 py-2 text-background-dark/60 hover:text-primary dark:text-background-light/60 dark:hover:text-primary"
+                    href="{{ url_for('profile') }}">
+                    <span class="material-symbols-outlined"> person </span>
+                    <span class="text-xs font-medium">Profile</span>
+                </a>
+            </nav>
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const backdrop = document.getElementById('mobileMenuBackdrop');
+        const menuLinks = document.querySelectorAll('.mobile-menu-link');
+
+        function openMenu() {
+            mobileMenu.classList.remove('-translate-x-full');
+            backdrop.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.add('-translate-x-full');
+            backdrop.classList.add('hidden');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        menuButton.addEventListener('click', openMenu);
+        backdrop.addEventListener('click', closeMenu);
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                closeMenu();
+            });
+        });
+    });
+</script>
+{% endblock %}

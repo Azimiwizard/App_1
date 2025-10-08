@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Classic Beef Burger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec7f13",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221910",
+                    },
+                    fontFamily: {
+                        "display": ["Epilogue"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-zinc-900 dark:text-zinc-100">
+<div class="flex flex-col h-screen justify-between">
+<div class="flex-grow overflow-y-auto">
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="flex items-center p-4">
+<button class="p-2 rounded-full">
+<span class="material-symbols-outlined text-zinc-900 dark:text-zinc-100">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-center flex-grow pr-10 text-zinc-900 dark:text-zinc-100">Classic Beef Burger</h1>
+</div>
+</header>
+<main>
+<div class="w-full aspect-[4/3] bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKoMmBduZwwD3NB0pB7j33XNsmVETgYL2tVMX_fIiDoe0nKEBjqSlDYhh9vAXCCzqq25xm0Ps4CoXFlwQMDEhzlh93LvBN50MJEZx2NsuH-Ikjd9G2CCxmM8Z5nCWg1gM8qcyoIQXs2EeqMQQRTONsXRPxz_1mCSlU4eNzaSY1qLJcUbwFmXgFhHvgDNWwcwfQlTXhKyHaH27oK3BxgrjQgQp9zsg8S381ur2ShCm_1wImJkmwHC3kZR83xMU7lZfDb-cY-ZvP7q8");'></div>
+<div class="p-6 space-y-6">
+<div>
+<h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Classic Beef Burger</h2>
+<p class="mt-2 text-zinc-700 dark:text-zinc-300">
+                            Our signature burger featuring a juicy beef patty, melted cheddar cheese, crisp lettuce, ripe tomato, and our special sauce, all nestled in a toasted sesame seed bun.
+                        </p>
+</div>
+<div class="border-t border-zinc-200 dark:border-zinc-800"></div>
+<div>
+<h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">Ingredients</h3>
+<p class="mt-2 text-zinc-700 dark:text-zinc-300">
+                            Beef patty, cheddar cheese, lettuce, tomato, special sauce, sesame seed bun.
+                        </p>
+</div>
+<div class="border-t border-zinc-200 dark:border-zinc-800"></div>
+<div>
+<h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">Allergens</h3>
+<p class="mt-2 text-zinc-700 dark:text-zinc-300">
+                            Contains: Gluten, Dairy, Soy.
+                        </p>
+</div>
+</div>
+</main>
+</div>
+<footer class="bg-background-light dark:bg-background-dark border-t border-zinc-200 dark:border-zinc-800 p-4">
+<div class="flex items-center justify-between gap-4">
+<div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                    $12.99
+                </div>
+<button class="flex-grow bg-primary text-white font-bold py-3 px-6 rounded-lg text-center">
+                    Add to Cart
+                </button>
+</div>
+</footer>
+</div>
+
+</body></html>

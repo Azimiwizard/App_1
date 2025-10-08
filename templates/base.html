@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Stitch Daily Menu{% endblock %}</title>
+    <!-- Tailwind CSS & Fonts -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec7f13",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221910",
+                        "text-light": "#f8f7f6",
+                        "text-dark": "#221910",
+                    },
+                    fontFamily: {
+                        "display": ["Epilogue"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Epilogue', sans-serif;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+
+<body class="bg-background-light text-text-dark dark:bg-background-dark dark:text-text-light font-display">
+    <nav class="bg-white dark:bg-gray-800 shadow-md mb-4">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <a class="text-xl font-bold text-primary" href="/">Stitch Menu</a>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a class="hover:text-primary" href="/menu">Menu</a>
+                    <a class="hover:text-primary" href="/cart">Cart</a>
+                    <a class="hover:text-primary" href="/profile">Profile</a>
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                    <a class="hover:text-primary" href="/admin">Admin</a>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                    <a class="hover:text-primary" href="/logout">Logout</a>
+                    {% else %}
+                    <a class="hover:text-primary" href="/login">Login</a>
+                    <a class="hover:text-primary" href="/register">Register</a>
+                    {% endif %}
+                    <button id="themeToggle" title="Toggle dark/light mode" class="focus:outline-none">
+                        <span class="material-symbols-outlined">dark_mode</span>
+                    </button>
+                </div>
+                <!-- Mobile Menu Button can be added here if needed -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4" role="alert">
+            <p>{{ messages[0] }}</p>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Theme toggle for Tailwind CSS
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlEl = document.documentElement;
+
+        // Set initial theme from localStorage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlEl.classList.add('dark');
+        } else {
+            htmlEl.classList.remove('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

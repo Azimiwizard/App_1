@@ -1,0 +1,47 @@
+/* Custom theme colors for Stitch Menu */
+:root {
+    --primary: #ffb347;
+    --secondary: #ffcc33;
+    --accent: #ff6f61;
+    --bs-body-bg: #fff8f0;
+    --bs-body-color: #222;
+}
+
+[data-bs-theme="dark"] {
+    --bs-body-bg: #181818;
+    --bs-body-color: #f8f9fa;
+    --primary: #ffcc33;
+    --secondary: #ffb347;
+    --accent: #ff6f61;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #222;
+}
+
+.btn-primary:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.navbar {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%) !important;
+}
+
+.theme-toggle {
+    transition: color 0.2s;
+}
+
+.theme-toggle:hover {
+    color: var(--accent);
+}
+
+/* Add more custom styles as needed */

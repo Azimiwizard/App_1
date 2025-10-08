@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stitch Design</title>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ec7f13",
+              "background-light": "#f8f7f6",
+              "background-dark": "#221910",
+            },
+            fontFamily: {
+              display: ["Epilogue"],
+            },
+            borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          },
+        },
+      };
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col justify-between">
+<div>
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 p-4 backdrop-blur-sm dark:bg-background-dark/80">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-gray-900 dark:text-white">
+<span class="material-symbols-outlined"> arrow_back </span>
+</button>
+<h2 class="flex-1 text-center text-lg font-bold text-gray-900 dark:text-white">Menu</h2>
+<div class="w-10"></div>
+</header>
+<main>
+<div class="h-56 w-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDCozjD4s1E1ScPDWWikuLWZcGUHDqDiF-WweNeGWSPbzyMiGleq9bQo5tIBK_HvHjR1sZiIYpu5Nx-K9jF0gJRa2M70ENQ80YrZpIgczVCAowRs3Yneqsx-ohwzumXRvuCZgE5WH5cDP4oXdfd2wTVKncUc2HNkd6GuBYmVJajZOcjZ4oLvRX2dvGxj8ITXUikLwNPAvdOCrQ8PHQDMGfU1e2kRW780ApqRmGVdUqFRVytXRWmO1woBJCNdzQGaDK2hT9bbH1mxYI");'></div>
+<div class="p-6">
+<div class="flex items-start justify-between">
+<h1 class="text-3xl font-bold text-gray-900 dark:text-white">Spicy Chicken Tacos</h1>
+<span class="text-2xl font-bold text-primary">$12.99</span>
+</div>
+<p class="mt-4 text-base leading-relaxed text-gray-600 dark:text-gray-400">
+              Our Spicy Chicken Tacos are a culinary adventure, blending tender grilled chicken with a vibrant mix of spices, all wrapped in a soft tortilla. Each bite offers a
+              delightful crunch from fresh toppings and a creamy, tangy sauce that perfectly balances the heat.
+            </p>
+<div class="mt-8 space-y-6">
+<div>
+<h3 class="text-lg font-bold text-gray-900 dark:text-white">Ingredients</h3>
+<p class="mt-2 text-base text-gray-600 dark:text-gray-400">Grilled Chicken, Tortillas, Spices, Fresh Toppings, Creamy Sauce</p>
+</div>
+<div>
+<h3 class="text-lg font-bold text-gray-900 dark:text-white">Allergen Information</h3>
+<div class="mt-2 flex flex-wrap gap-2">
+<span class="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">Contains Dairy</span>
+<span class="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">Contains Gluten</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<div class="sticky bottom-0 bg-background-light px-4 pt-4 pb-8 dark:bg-background-dark">
+<button class="flex h-12 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-5 text-base font-bold text-white">
+<span class="truncate">Add to Cart</span>
+</button>
+</div>
+<nav class="sticky bottom-0 border-t border-gray-200 bg-background-light dark:border-gray-800 dark:bg-background-dark">
+<div class="mx-auto flex max-w-md justify-around py-2">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1"> restaurant_menu </span>
+<p class="text-xs font-medium">Menu</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="#">
+<span class="material-symbols-outlined"> shopping_cart </span>
+<p class="text-xs font-medium">Cart</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="#">
+<span class="material-symbols-outlined"> person </span>
+<p class="text-xs font-medium">Profile</p>
+</a>
+</div>
+</nav>
+</div>
+
+</body></html>

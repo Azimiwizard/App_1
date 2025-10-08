@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ dish.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col -m-4">
+    <header
+        class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm flex items-center justify-between p-4">
+        <a href="{{ url_for('menu') }}"
+            class="flex items-center justify-center p-2 -ml-2 rounded-full text-text-dark dark:text-text-light hover:bg-primary/20">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold text-center flex-grow text-text-dark dark:text-text-light pr-8">{{ dish.name }}
+        </h1>
+    </header>
+
+    <main class="flex-grow">
+        <div class="w-full aspect-[4/3] bg-cover bg-center" style='background-image: url("{{ dish.image_url }}");'>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <h2 class="text-3xl font-bold text-text-dark dark:text-text-light">{{ dish.name }}</h2>
+                <p class="mt-2 text-lg font-semibold text-primary">${{ '%.2f'|format(dish.price) }}</p>
+                <p class="mt-2 text-base text-text-dark/80 dark:text-text-light/80">
+                    {{ dish.description }}
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="sticky bottom-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4">
+        <form method="post" action="{{ url_for('add_to_cart', dish_id=dish.id) }}">
+            <button type="submit"
+                class="w-full h-14 bg-primary text-white font-bold text-lg rounded-lg shadow-lg hover:bg-primary/90 transition-colors">
+                Add to Cart
+            </button>
+        </form>
+    </footer>
+</div>
+{% endblock %}
