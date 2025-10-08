@@ -6,7 +6,7 @@ This document provides steps to deploy the Flask app to Heroku using Gunicorn as
 
 - Install [Git](https://git-scm.com/download/win) for Windows
 - Install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
-- Have a Heroku account
+- Have a Heroku account and verify it by adding payment information at https://heroku.com/verify (required to create apps)
 
 ## Steps
 
