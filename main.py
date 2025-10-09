@@ -187,14 +187,14 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/make_first_admin')
-def make_first_admin():
-    user = User.query.first()
-    if user and not user.is_admin:
-        user.is_admin = True
+@app.route('/promote_me')
+@login_required
+def promote_me():
+    if not current_user.is_admin:
+        current_user.is_admin = True
         db.session.commit()
-        return f'User {user.username} is now admin. You can remove this route now.'
-    return 'Already admin or no user.'
+        return 'You are now admin. You can remove this route now.'
+    return 'Already admin.'
 
 
 @app.route('/menu', methods=['GET', 'POST'])
