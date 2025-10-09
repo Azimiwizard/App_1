@@ -158,7 +158,7 @@ def register():
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
         # Make the first user an admin automatically
-        if not User.query.filter_by(is_admin=True).first():
+        if User.query.count() == 0:
             user.is_admin = True
         db.session.commit()
         flash('Registration successful! Please log in.')
@@ -185,6 +185,16 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+
+@app.route('/make_first_admin')
+def make_first_admin():
+    user = User.query.first()
+    if user and not user.is_admin:
+        user.is_admin = True
+        db.session.commit()
+        return f'User {user.username} is now admin. You can remove this route now.'
+    return 'Already admin or no user.'
 
 
 @app.route('/menu', methods=['GET', 'POST'])
