@@ -1,0 +1,88 @@
+{
+    "name": "Stitch Menu Order Processing",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "order-webhook",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "const order = items[0].json;\n\n// Extract relevant fields\nconst customerNumber = order.customer_number || '';\nconst message = order.message || '';\nconst aiResponse = order.ai_response || '';\n\nreturn [{ json: { customerNumber, message, aiResponse } }];"
+            },
+            "name": "Parse Order Data",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth2",
+                "sheetId": "your_google_sheet_id_here",
+                "range": "Sheet1!A:C",
+                "valueInputMode": "USER_ENTERED",
+                "options": {},
+                "data": [
+                    {
+                        "column": "A",
+                        "value": "={{$json[\"customerNumber\"]}}"
+                    },
+                    {
+                        "column": "B",
+                        "value": "={{$json[\"message\"]}}"
+                    },
+                    {
+                        "column": "C",
+                        "value": "={{$json[\"aiResponse\"]}}"
+                    }
+                ]
+            },
+            "name": "Add Row to Google Sheets",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ],
+            "credentials": {
+                "googleSheetsOAuth2Api": "Google Sheets Account"
+            }
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Parse Order Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parse Order Data": {
+            "main": [
+                [
+                    {
+                        "node": "Add Row to Google Sheets",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

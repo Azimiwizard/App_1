@@ -4,3 +4,8 @@ Flask-Login
 Werkzeug
 gunicorn
 psycopg2-binary
+Flask-WTF
+twilio
+requests
+openai
+google-cloud-speech

@@ -5,39 +5,67 @@
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-6 text-center">Add New Dish</h2>
-    <form method="post" class="space-y-6">
+    <form method="post" class="space-y-6" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
         <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-            <input type="text" id="name" name="name" required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600">
+            {{ form.name.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+            {{ form.name(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary
+            focus:ring-primary dark:bg-gray-700 dark:border-gray-600") }}
+            {% if form.name.errors %}
+            <div class="text-red-500 text-sm mt-1">
+                {% for error in form.name.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         <div>
-            <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
-            <input type="number" id="price" name="price" step="0.01" required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600">
+            {{ form.price.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+            {{ form.price(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary
+            focus:ring-primary dark:bg-gray-700 dark:border-gray-600") }}
+            {% if form.price.errors %}
+            <div class="text-red-500 text-sm mt-1">
+                {% for error in form.price.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         <div>
-            <label for="description"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-            <textarea id="description" name="description" rows="3"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600"></textarea>
+            {{ form.description.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+            {{ form.description(rows=3, class="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+            focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600") }}
+            {% if form.description.errors %}
+            <div class="text-red-500 text-sm mt-1">
+                {% for error in form.description.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         <div>
-            <label for="image_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
-            <input type="text" id="image_url" name="image_url"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600">
+            {{ form.image.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+            {{ form.image(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary
+            focus:ring-primary dark:bg-gray-700 dark:border-gray-600") }}
+            {% if form.image.errors %}
+            <div class="text-red-500 text-sm mt-1">
+                {% for error in form.image.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         <div>
-            <label for="section" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Section</label>
-            <select id="section" name="section" required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600">
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Drinks">Drinks</option>
-                <option value="Daily Specials">Daily Specials</option>
-                <option value="Other">Other</option>
-            </select>
+            {{ form.section.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+            {{ form.section(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary
+            focus:ring-primary dark:bg-gray-700 dark:border-gray-600") }}
+            {% if form.section.errors %}
+            <div class="text-red-500 text-sm mt-1">
+                {% for error in form.section.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         <div class="flex items-center justify-between">
             <a href="{{ url_for('admin_dashboard') }}" class="text-sm text-primary hover:underline">Back to
