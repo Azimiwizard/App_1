@@ -190,11 +190,9 @@ def logout():
 @app.route('/promote_me')
 @login_required
 def promote_me():
-    if not current_user.is_admin:
-        current_user.is_admin = True
-        db.session.commit()
-        return 'You are now admin. You can remove this route now.'
-    return 'Already admin.'
+    current_user.is_admin = True
+    db.session.commit()
+    return 'You are now admin. You can remove this route now.'
 
 
 @app.route('/menu', methods=['GET', 'POST'])
