@@ -336,9 +336,7 @@ def profile():
 
 
 # --- CLI Commands ---
-@app.cli.command('seed')
-def seed():
-    db.create_all()
+def seed_database():
     if Dish.query.first():
         print('Dishes already exist. Skipping seeding.')
         return
@@ -376,6 +374,12 @@ def seed():
     print('Seeded dishes!')
 
 
+@app.cli.command('seed')
+def seed():
+    db.create_all()
+    seed_database()
+
+
 # Make the first user an admin (run once)
 @app.cli.command('make_admin')
 def make_admin():
@@ -397,3 +401,4 @@ if __name__ == '__main__':
 # Ensure database tables are created on app startup in production
 with app.app_context():
     db.create_all()
+    seed_database()
