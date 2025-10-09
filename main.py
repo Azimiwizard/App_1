@@ -157,6 +157,9 @@ def register():
         hashed_password = generate_password_hash(password)
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
+        # Make the first user an admin automatically
+        if not User.query.filter_by(is_admin=True).first():
+            user.is_admin = True
         db.session.commit()
         flash('Registration successful! Please log in.')
         return redirect(url_for('login'))
