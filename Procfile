@@ -1,2 +1,2 @@
 web: gunicorn main:app
-release: python init_db.py
+release: python scripts/init_db_command.py
