@@ -1,59 +1,25 @@
-# Dish Management Enhancements TODO
+# TODO for Railway Deployment Preparation
 
-## 1. Input Validation
-- [x] Add WTForms dependency to requirements.txt
-- [x] Create forms.py with DishForm
-- [x] Update admin_add_dish route to use form validation
-- [x] Update admin_edit_dish route to use form validation
-- [x] Update templates to display validation errors
+## Overview
+Preparing the Stitch Daily Menu Flask app for smooth deployment on Railway with PostgreSQL database. This includes cleaning structure, enabling seeding, updating docs, and ensuring configs are set.
 
-## 2. Image Upload Feature
-- [x] Create static/uploads directory
-- [x] Update Dish model to store image filename instead of URL
-- [x] Modify admin_add_dish route to handle file upload
-- [x] Modify admin_edit_dish route to handle file upload
-- [x] Update templates to use file input instead of URL
-- [x] Add image display logic in templates
+## Steps
 
-## 3. Dynamic Sections
-- [ ] Create Section model
-- [ ] Add admin routes for section CRUD
-- [ ] Update Dish model to reference Section
-- [ ] Update forms to use dynamic sections
-- [ ] Create admin_sections.html template
-- [ ] Update menu logic to use dynamic sections
+1. [x] Clean project structure: Attempted to remove nested `stitch_app/` but failed due to locked files; duplicates exist but root files are primary and should not interfere.
 
-## 4. Dish Cloning
-- [ ] Add clone route in main.py
-- [ ] Add clone button in admin_dashboard.html
-- [ ] Handle image copying for cloned dishes
+2. [x] Update `main.py`: Uncommented the `seed_database()` call after `db.create_all()` to automatically populate initial dishes on the first deployment (it checks if data exists to avoid duplicates).
 
-## 5. Search and Filter in Admin
-- [ ] Update admin_dashboard route to accept query params
-- [ ] Add search form in admin_dashboard.html
-- [ ] Implement filtering logic
+3. [x] Review and update `.gitignore`: Added `instance/` to ignore SQLAlchemy instance folder.
 
-## 6. Bulk Add Functionality
-- [ ] Add bulk_add route
-- [ ] Create bulk_add.html template
-- [ ] Implement CSV parsing logic
-- [ ] Add bulk add button in admin dashboard
+4. [x] Update `RAILWAY_DEPLOYMENT.md`: Added notes on required env vars, seeding, and troubleshooting section.
 
-## 7. Rich Text Descriptions
-- [ ] Add TinyMCE dependency
-- [ ] Update templates to include TinyMCE
-- [ ] Update forms to handle HTML content
+5. [x] Verify `Procfile` and `scripts/init_db_command.py`: Confirmed no changes needed; release phase handles DB init.
 
-## 8. Preview Before Save
-- [ ] Add preview modal in add/edit templates
-- [ ] Create preview logic (simulate menu display)
+6. [ ] Test configuration: After edits, suggest local test with PostgreSQL (optional), then push to GitHub for Railway deployment.
 
-## 9. Audit Logging
-- [ ] Create AuditLog model
-- [ ] Add logging to dish CRUD operations
-- [ ] Create admin_audit_logs.html template
+7. [ ] Deploy and verify: Connect repo to Railway, add PostgreSQL service, set env vars, trigger deploy, check logs, and test app functionality (e.g., register user, add dish, place order).
 
-## 10. API Endpoints
-- [ ] Add API routes for dish CRUD
-- [ ] Implement JSON responses
-- [ ] Add authentication for API
+## Notes
+- Required env vars on Railway: `SECRET_KEY` (generate a strong one), `DATABASE_URL` (auto from PostgreSQL service), optional: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `OPENAI_API_KEY`, `N8N_WEBHOOK_URL`.
+- After deployment, use Railway shell to run `python make_admin.py` if needed for admin user.
+- Monitor Railway logs for any import errors due to structure clean-up.

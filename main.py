@@ -19,8 +19,15 @@ import io
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'supersecretkey')
 # Use Heroku's DATABASE_URL if available, otherwise fall back to local SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'sqlite:///stitch_menu.db').replace('postgres://', 'postgresql://')
+database_url = os.environ.get('DATABASE_URL')
+if database_url is None:
+    if os.environ.get('PORT'):  # Production environment
+        raise RuntimeError(
+            "DATABASE_URL environment variable is required for production deployment. Add a PostgreSQL database service in your Railway dashboard.")
+    database_url = 'sqlite:///stitch_menu.db'
+else:
+    database_url = database_url.replace('postgres://', 'postgresql://')
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 login_manager = LoginManager(app)
@@ -378,7 +385,7 @@ if __name__ == '__main__':
 # Ensure database tables are created on app startup in production
 with app.app_context():
     db.create_all()
-    # seed_database()  # Temporarily commented out to fix init_db.py error
+    seed_database()  # Populate initial dishes if not present
 
 
 # Twilio and AI integration blueprint

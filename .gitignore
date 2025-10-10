@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 stitch_menu.db
 .env
+instance/
