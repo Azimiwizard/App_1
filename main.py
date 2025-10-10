@@ -20,11 +20,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'supersecretkey')
 # Use Heroku's DATABASE_URL if available, otherwise fall back to local SQLite
 database_url = os.environ.get('DATABASE_URL')
-if database_url is None:
-    if os.environ.get('PORT'):  # Production environment
-        raise RuntimeError(
-            "DATABASE_URL environment variable is required for production deployment. Add a PostgreSQL database service in your Railway dashboard.")
-    database_url = 'sqlite:///stitch_menu.db'
+if not database_url:
+    raise RuntimeError(
+        "DATABASE_URL environment variable is required. Add a PostgreSQL database service in your Railway dashboard and link it to your app.")
 else:
     database_url = database_url.replace('postgres://', 'postgresql://')
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url

@@ -9,16 +9,17 @@ Railway is a modern cloud platform for deploying apps.
 
 ## Steps
 
-1. **Connect GitHub Repo**
+1. **Add Database First**
 
    - Go to https://railway.app
    - Create a new project
-   - Connect your GitHub repository
-
-2. **Add Database**
-
-   - In Railway dashboard, add a PostgreSQL database
+   - **Important**: Add a PostgreSQL database service immediately (before connecting code)
    - Railway will set DATABASE_URL automatically
+   - Without this, the app will fail to start with "DATABASE_URL environment variable is required"
+
+2. **Connect GitHub Repo**
+
+   - Connect your GitHub repository to the project
 
 3. **Set Environment Variables**
 
