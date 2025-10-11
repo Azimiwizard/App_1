@@ -26,8 +26,6 @@ Railway is a modern cloud platform for deploying apps.
    - In Railway project settings, add:
      - SECRET_KEY: (required) Generate a strong secret key, e.g., using `openssl rand -hex 32`
      - DATABASE_URL: (auto-set by Railway PostgreSQL service)
-     - TWILIO_ACCOUNT_SID: (optional, if using Twilio voice/WhatsApp)
-     - TWILIO_AUTH_TOKEN: (optional, if using Twilio)
      - OPENAI_API_KEY: (optional, if using AI order parsing)
      - N8N_WEBHOOK_URL: (optional, if using n8n for order processing)
 

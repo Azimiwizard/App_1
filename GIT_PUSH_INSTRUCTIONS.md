@@ -39,18 +39,10 @@ Follow these steps to deploy your Flask app to Railway:
    - Add the following environment variables:
      - `SECRET_KEY`: A random secret key for Flask sessions.
      - `OPENAI_API_KEY`: Your OpenAI API key for AI order parsing.
-     - `TWILIO_ACCOUNT_SID`: Your Twilio Account SID.
-     - `TWILIO_AUTH_TOKEN`: Your Twilio Auth Token.
      - `N8N_WEBHOOK_URL`: (Optional) URL for n8n webhook integration.
    - Railway provides `DATABASE_URL` automatically for PostgreSQL.
 
-4. Set up Twilio Webhooks (after deployment):
-   - Once deployed, note your Railway app URL (e.g., https://your-app.railway.app).
-   - In Twilio Console:
-     - For Voice: Set webhook URL to `https://your-app.railway.app/twilio/voice`
-     - For WhatsApp: Set webhook URL to `https://your-app.railway.app/twilio/whatsapp/ai`
-
-5. Database Setup:
+4. Database Setup:
    - Railway provides PostgreSQL automatically.
    - The app will create tables on startup.
 
