@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from flask import url_for
 
 db = SQLAlchemy()
 
@@ -23,6 +24,14 @@ class Dish(db.Model):
     description = db.Column(db.Text)
     image_filename = db.Column(db.String(300))
     section = db.Column(db.String(50), nullable=False, default='Other')
+
+    @property
+    def image_url(self):
+        if self.image_filename and self.image_filename.startswith('http'):
+            return self.image_filename
+        elif self.image_filename:
+            return url_for('static', filename='uploads/' + self.image_filename)
+        return None
 
 
 class Order(db.Model):

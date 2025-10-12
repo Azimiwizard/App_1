@@ -10,7 +10,7 @@ from models import db, User, Dish, Order, OrderItem, CartItem
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'supersecretkey')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-secure-random-string-that-you-should-replace') # Replace with a real secret key in your environment variables
 # Use Heroku's DATABASE_URL if available, otherwise fall back to local SQLite
 database_url = os.environ.get('DATABASE_URL')
 if not database_url:
@@ -131,9 +131,6 @@ def register():
         hashed_password = generate_password_hash(password)
         user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
-        # Make the first user an admin automatically
-        if User.query.count() == 0:
-            user.is_admin = True
         db.session.commit()
         flash('Registration successful! Please log in.')
         return redirect(url_for('login'))
@@ -160,13 +157,6 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-
-@app.route('/promote_me')
-@login_required
-def promote_me():
-    current_user.is_admin = True
-    db.session.commit()
-    return 'You are now admin. You can remove this route now.'
 
 
 @app.route('/menu', methods=['GET', 'POST'])
@@ -372,11 +362,3 @@ if __name__ == '__main__':
         db.create_all()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-
-# Ensure database tables are created on app startup in production
-with app.app_context():
-    db.create_all()
-    seed_database()  # Populate initial dishes if not present
-
-
-

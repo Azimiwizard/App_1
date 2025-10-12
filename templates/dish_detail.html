@@ -15,8 +15,7 @@
     </header>
 
     <main class="flex-grow">
-        <div class="w-full aspect-[4/3] bg-cover bg-center"
-            style="background-image: url('{% if dish.image_filename %}{{ url_for('static', filename='uploads/' ~ dish.image_filename) }}{% else %}{{ dish.image_url }}{% endif %}');">
+        <div class="w-full aspect-[4/3] bg-cover bg-center" style="background-image: url('{{ dish.image_url }}');">
         </div>
         <div class="p-6 space-y-4">
             <div>
