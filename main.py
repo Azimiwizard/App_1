@@ -10,7 +10,9 @@ from models import db, User, Dish, Order, OrderItem, CartItem
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-secure-random-string-that-you-should-replace') # Replace with a real secret key in your environment variables
+# Replace with a real secret key in your environment variables
+app.config['SECRET_KEY'] = os.environ.get(
+    'SECRET_KEY', 'a-secure-random-string-that-you-should-replace')
 # Use Heroku's DATABASE_URL if available, otherwise fall back to local SQLite
 database_url = os.environ.get('DATABASE_URL')
 if not database_url:
@@ -23,6 +25,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+# Create tables and seed if not exist
+with app.app_context():
+    db.create_all()
+    seed_database()
 
 
 @login_manager.user_loader
@@ -156,7 +163,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
-
 
 
 @app.route('/menu', methods=['GET', 'POST'])
