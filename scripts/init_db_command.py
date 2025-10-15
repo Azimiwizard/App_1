@@ -1,9 +1,10 @@
-from models import db, Dish  # Import db and Dish from models
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
-import os
+from flask_sqlalchemy import SQLAlchemy
+from models import db, Dish  # Import db and Dish from models
 import sys
+import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 # Create app instance for this script
 app = Flask(__name__)

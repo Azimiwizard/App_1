@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, FloatField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, NumberRange, ValidationError
+from wtforms import StringField, FloatField, TextAreaField, SelectField, SubmitField, RadioField
+from wtforms.validators import DataRequired, NumberRange, ValidationError, InputRequired
 from models import Dish
 
 
@@ -24,3 +24,15 @@ class DishForm(FlaskForm):
     def validate_name(self, field):
         if Dish.query.filter_by(name=field.data).first():
             raise ValidationError('Dish name must be unique.')
+
+
+class ReviewForm(FlaskForm):
+    rating = RadioField('Rating', choices=[
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5')
+    ])
+    review_text = TextAreaField('Review (optional)')
+    submit = SubmitField('Submit Review')

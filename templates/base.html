@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Stitch Daily Menu{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <!-- Tailwind CSS & Fonts -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&amp;display=swap"
@@ -20,13 +22,34 @@
                 extend: {
                     colors: {
                         "primary": "#ec7f13",
-                        "background-light": "#f8f7f6",
-                        "background-dark": "#221910",
-                        "text-light": "#f8f7f6",
-                        "text-dark": "#221910",
+                        "secondary": "#ff6b35",
+                        "accent": "#f7931e",
+                        "background-light": "#fefefe",
+                        "background-dark": "#1a1a1a",
+                        "text-light": "#ffffff",
+                        "text-dark": "#2d2d2d",
+                        "glass": "rgba(255, 255, 255, 0.1)",
+                        "glass-dark": "rgba(0, 0, 0, 0.2)",
                     },
                     fontFamily: {
                         "display": ["Epilogue"]
+                    },
+                    animation: {
+                        "fade-in": "fadeIn 0.5s ease-in-out",
+                        "slide-up": "slideUp 0.3s ease-out",
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            "0%": { opacity: "0" },
+                            "100%": { opacity: "1" },
+                        },
+                        slideUp: {
+                            "0%": { transform: "translateY(10px)", opacity: "0" },
+                            "100%": { transform: "translateY(0)", opacity: "1" },
+                        },
+                    },
+                    backdropBlur: {
+                        "xs": "2px",
                     },
                 },
             },
@@ -41,25 +64,67 @@
 </head>
 
 <body class="bg-background-light text-text-dark dark:bg-background-dark dark:text-text-light font-display">
-    <nav class="bg-white dark:bg-gray-800 shadow-md mb-4">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-3">
-                <a class="text-xl font-bold text-primary" href="/">Stitch Menu</a>
-                <div class="hidden md:flex items-center space-x-4">
-                    <a class="hover:text-primary" href="/menu">Menu</a>
-                    <a class="hover:text-primary" href="/cart">Cart</a>
-                    <a class="hover:text-primary" href="/profile">Profile</a>
+    <!-- Custom Styled Title Bar - Only shown in desktop app -->
+    <div id="titleBar" class="select-none cursor-move hidden">
+        <div class="flex justify-end items-center px-6 py-3">
+            <div class="flex items-center space-x-1">
+                <button id="minimizeBtn" title="Minimize"
+                    class="focus:outline-none w-8 h-8 rounded-md hover:bg-white/20 transition-all duration-200 flex items-center justify-center group">
+                    <span
+                        class="material-symbols-outlined text-white text-lg group-hover:scale-110 transition-transform duration-200">minimize</span>
+                </button>
+                <button id="restoreBtn" title="Restore"
+                    class="focus:outline-none w-8 h-8 rounded-md hover:bg-white/20 transition-all duration-200 flex items-center justify-center group">
+                    <span
+                        class="material-symbols-outlined text-white text-lg group-hover:scale-110 transition-transform duration-200">fullscreen_exit</span>
+                </button>
+                <button id="maximizeBtn" title="Maximize"
+                    class="focus:outline-none w-8 h-8 rounded-md hover:bg-white/20 transition-all duration-200 flex items-center justify-center group">
+                    <span
+                        class="material-symbols-outlined text-white text-lg group-hover:scale-110 transition-transform duration-200">fullscreen</span>
+                </button>
+                <button id="closeBtn" title="Close"
+                    class="focus:outline-none w-8 h-8 rounded-md hover:bg-red-500/80 transition-all duration-200 flex items-center justify-center group">
+                    <span
+                        class="material-symbols-outlined text-white text-lg group-hover:scale-110 transition-transform duration-200">close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <nav id="navBar"
+        class="backdrop-blur-xs bg-glass dark:bg-glass-dark border-b border-gray-200 dark:border-gray-700 shadow-lg mb-6 animate-slide-up">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center py-4">
+                <a class="flex items-center text-2xl font-bold text-primary hover:scale-105 transition-transform duration-200"
+                    href="/">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Stitch Menu Logo"
+                        class="h-10 w-10 mr-3 rounded-full shadow-sm">
+                    Stitch Menu
+                </a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a class="text-text-dark dark:text-text-light hover:text-primary transition-colors duration-200 font-medium"
+                        href="/menu">Menu</a>
+                    <a class="text-text-dark dark:text-text-light hover:text-primary transition-colors duration-200 font-medium"
+                        href="/cart">Cart</a>
+                    <a class="text-text-dark dark:text-text-light hover:text-primary transition-colors duration-200 font-medium"
+                        href="/profile">Profile</a>
                     {% if current_user.is_authenticated and current_user.is_admin %}
-                    <a class="hover:text-primary" href="/admin">Admin</a>
+                    <a class="text-text-dark dark:text-text-light hover:text-primary transition-colors duration-200 font-medium"
+                        href="/admin">Admin</a>
                     {% endif %}
                     {% if current_user.is_authenticated %}
-                    <a class="hover:text-primary" href="/logout">Logout</a>
+                    <a class="text-text-dark dark:text-text-light hover:text-primary transition-colors duration-200 font-medium"
+                        href="/logout">Logout</a>
                     {% else %}
-                    <a class="hover:text-primary" href="/login">Login</a>
-                    <a class="hover:text-primary" href="/register">Register</a>
+                    <a class="text-text-dark dark:text-text-light hover:text-primary transition-colors duration-200 font-medium"
+                        href="/login">Login</a>
+                    <a class="text-text-dark dark:text-text-light hover:text-primary transition-colors duration-200 font-medium"
+                        href="/register">Register</a>
                     {% endif %}
-                    <button id="themeToggle" title="Toggle dark/light mode" class="focus:outline-none">
-                        <span class="material-symbols-outlined">dark_mode</span>
+                    <button id="themeToggle" title="Toggle dark/light mode"
+                        class="focus:outline-none p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="material-symbols-outlined text-text-dark dark:text-text-light">dark_mode</span>
                     </button>
                 </div>
                 <!-- Mobile Menu Button can be added here if needed -->
@@ -96,6 +161,41 @@
             htmlEl.classList.toggle('dark');
             localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
         });
+
+        // Window controls for frameless desktop app
+        if (window.pywebview) {
+            // Show title bar only in desktop app
+            const titleBar = document.getElementById('titleBar');
+            titleBar.classList.remove('hidden');
+
+            const minimizeBtn = document.getElementById('minimizeBtn');
+            const restoreBtn = document.getElementById('restoreBtn');
+            const maximizeBtn = document.getElementById('maximizeBtn');
+            const closeBtn = document.getElementById('closeBtn');
+
+            minimizeBtn.addEventListener('click', () => {
+                window.pywebview.api.minimize();
+            });
+
+            restoreBtn.addEventListener('click', () => {
+                window.pywebview.api.restore();
+            });
+
+            maximizeBtn.addEventListener('click', () => {
+                window.pywebview.api.maximize();
+            });
+
+            closeBtn.addEventListener('click', () => {
+                window.pywebview.api.close();
+            });
+
+            // Make title bar draggable
+            titleBar.addEventListener('mousedown', (e) => {
+                if (e.target === titleBar || titleBar.contains(e.target)) {
+                    window.pywebview.api.start_drag();
+                }
+            });
+        }
     </script>
     {% block scripts %}{% endblock %}
 </body>

@@ -1,47 +1,158 @@
 /* Custom theme colors for Stitch Menu */
 :root {
-    --primary: #ffb347;
-    --secondary: #ffcc33;
-    --accent: #ff6f61;
-    --bs-body-bg: #fff8f0;
-    --bs-body-color: #222;
+    --primary: #ec7f13;
+    --secondary: #ff6b35;
+    --accent: #f7931e;
+    --bs-body-bg: #fefefe;
+    --bs-body-color: #2d2d2d;
 }
 
 [data-bs-theme="dark"] {
-    --bs-body-bg: #181818;
-    --bs-body-color: #f8f9fa;
-    --primary: #ffcc33;
-    --secondary: #ffb347;
-    --accent: #ff6f61;
+    --bs-body-bg: #1a1a1a;
+    --bs-body-color: #ffffff;
+    --primary: #f7931e;
+    --secondary: #ff6b35;
+    --accent: #ec7f13;
 }
 
 .btn-primary {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: #222;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(236, 127, 19, 0.3);
+    transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(236, 127, 19, 0.4);
     color: #fff;
 }
 
 .card {
-    border-radius: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .navbar {
-    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%) !important;
+    background: linear-gradient(135deg, rgba(236, 127, 19, 0.1), rgba(255, 107, 53, 0.1));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .theme-toggle {
-    transition: color 0.2s;
+    transition: all 0.3s ease;
 }
 
 .theme-toggle:hover {
+    transform: scale(1.1);
     color: var(--accent);
 }
 
-/* Add more custom styles as needed */
+/* Dish card hover effect */
+.dish-card {
+    transform: scale(0.84);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dish-card:hover {
+    transform: scale(0.88);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Additional modern styles */
+body {
+    background: linear-gradient(135deg, #fefefe 0%, #f5f5f5 100%);
+}
+
+[data-bs-theme="dark"] body {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Glassmorphism effect */
+.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Desktop app title bar styles */
+#titleBar {
+    -webkit-app-region: drag;
+    user-select: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 48px;
+    background: linear-gradient(135deg, #ec7f13 0%, #ff6b35 50%, #f7931e 100%);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#titleBar button {
+    -webkit-app-region: no-drag;
+}
+
+body {
+    padding-top: 48px;
+    /* Account for fixed title bar */
+}
+
+/* Enhanced desktop app styling */
+@media (max-width: 1024px) {
+    #titleBar {
+        display: none;
+        /* Hide title bar on smaller screens */
+    }
+
+    body {
+        padding-top: 0;
+    }
+}

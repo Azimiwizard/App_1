@@ -19,24 +19,71 @@
                     Total</th>
                 <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Status</th>
+                <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Created At</th>
+                <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Actions</th>
             </tr>
         </thead>
         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {% for order in orders %}
-            <tr>
+            <tr id="order-{{ order.id }}">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ order.id }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ order.user_id }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${{
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{
                     '%.2f'|format(order.total) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    {% if order.status == 'pending' %}
+                    <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">Pending</span>
+                    {% elif order.status == 'preparing' %}
+                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">Preparing</span>
+                    {% elif order.status == 'ready' %}
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Ready</span>
+                    {% elif order.status == 'delivered' %}
+                    <span
+                        class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">Delivered</span>
+                    {% else %}
+                    <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ order.status
+                        }}</span>
+                    {% endif %}
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{
                     order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {% if order.status == 'pending' %}
+                    <form method="POST"
+                        action="{{ url_for('update_order_status', order_id=order.id, status='preparing') }}"
+                        style="display: inline;">
+                        <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">Start
+                            Preparing</button>
+                    </form>
+                    {% elif order.status == 'preparing' %}
+                    <form method="POST" action="{{ url_for('update_order_status', order_id=order.id, status='ready') }}"
+                        style="display: inline;">
+                        <button type="submit"
+                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-xs">Mark
+                            Ready</button>
+                    </form>
+                    {% elif order.status == 'ready' %}
+                    <form method="POST"
+                        action="{{ url_for('update_order_status', order_id=order.id, status='delivered') }}"
+                        style="display: inline;">
+                        <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">Mark
+                            Delivered</button>
+                    </form>
+                    {% endif %}
+                </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="4"
+                <td colspan="6"
                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 text-center">No orders
                     found.</td>
             </tr>
@@ -44,4 +91,41 @@
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    socket.on('order_status_update', function (data) {
+        const orderRow = document.getElementById('order-' + data.order_id);
+        if (orderRow) {
+            const statusCell = orderRow.querySelector('td:nth-child(4)');
+            const actionsCell = orderRow.querySelector('td:nth-child(6)');
+
+            // Update status badge
+            let statusBadge = '';
+            if (data.status === 'pending') {
+                statusBadge = '<span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">Pending</span>';
+            } else if (data.status === 'preparing') {
+                statusBadge = '<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">Preparing</span>';
+            } else if (data.status === 'ready') {
+                statusBadge = '<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Ready</span>';
+            } else if (data.status === 'delivered') {
+                statusBadge = '<span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">Delivered</span>';
+            }
+            statusCell.innerHTML = statusBadge;
+
+            // Update actions
+            let actions = '';
+            if (data.status === 'pending') {
+                actions = '<form method="POST" action="/admin/orders/' + data.order_id + '/status/preparing" style="display: inline;"><button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">Start Preparing</button></form>';
+            } else if (data.status === 'preparing') {
+                actions = '<form method="POST" action="/admin/orders/' + data.order_id + '/status/ready" style="display: inline;"><button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-xs">Mark Ready</button></form>';
+            } else if (data.status === 'ready') {
+                actions = '<form method="POST" action="/admin/orders/' + data.order_id + '/status/delivered" style="display: inline;"><button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">Mark Delivered</button></form>';
+            }
+            actionsCell.innerHTML = actions;
+        }
+    });
+</script>
 {% endblock %}

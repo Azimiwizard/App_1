@@ -5,6 +5,14 @@
 {% block content %}
 <div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mt-10">
     <h2 class="text-2xl font-bold mb-6 text-center">User Profile</h2>
+    <div class="mb-6">
+        <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">Loyalty Points: <span class="text-primary">{{
+                user.points }}</span></p>
+        {% if not user.is_admin %}
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Not an admin? <a href="{{ url_for('claim_admin') }}"
+                class="text-primary hover:underline">Claim admin privileges</a></p>
+        {% endif %}
+    </div>
     <form method="post" class="space-y-6">
         <div>
             <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>

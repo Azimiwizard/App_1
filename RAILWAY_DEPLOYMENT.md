@@ -50,6 +50,7 @@ Railway is a modern cloud platform for deploying apps.
 
 - Railway uses Procfile if present for web command
 - Database init is handled in main.py on startup; seeding runs automatically on first deploy
+- For Socket.IO support, Gunicorn is configured with eventlet worker class
 - Free tier: 512MB RAM, 1GB disk, etc.
 
 ## Troubleshooting
