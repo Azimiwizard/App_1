@@ -65,8 +65,14 @@
 
 <body class="bg-background-light text-text-dark dark:bg-background-dark dark:text-text-light font-display">
     <!-- Custom Styled Title Bar - Only shown in desktop app -->
-    <div id="titleBar" class="select-none cursor-move hidden">
-        <div class="flex justify-end items-center px-6 py-3">
+    <div id="titleBar"
+        class="bg-gradient-to-r from-primary to-secondary backdrop-blur-md select-none cursor-move hidden fixed top-0 left-0 right-0 z-50 shadow-lg">
+        <div class="flex justify-between items-center px-6 py-3">
+            <div class="flex items-center">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Stitch Menu Logo"
+                    class="h-8 w-8 mr-3 rounded-full shadow-sm">
+                <span class="text-white font-bold text-lg">Stitch Menu</span>
+            </div>
             <div class="flex items-center space-x-1">
                 <button id="minimizeBtn" title="Minimize"
                     class="focus:outline-none w-8 h-8 rounded-md hover:bg-white/20 transition-all duration-200 flex items-center justify-center group">
@@ -74,7 +80,7 @@
                         class="material-symbols-outlined text-white text-lg group-hover:scale-110 transition-transform duration-200">minimize</span>
                 </button>
                 <button id="restoreBtn" title="Restore"
-                    class="focus:outline-none w-8 h-8 rounded-md hover:bg-white/20 transition-all duration-200 flex items-center justify-center group">
+                    class="focus:outline-none w-8 h-8 rounded-md hover:bg-white/20 transition-all duration-200 flex items-center justify-center group hidden">
                     <span
                         class="material-symbols-outlined text-white text-lg group-hover:scale-110 transition-transform duration-200">fullscreen_exit</span>
                 </button>
