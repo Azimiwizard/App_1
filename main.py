@@ -7,9 +7,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from flask_socketio import SocketIO
 from forms import DishForm, ReviewForm
-from models import db, User, Dish, Order, OrderItem, CartItem, Review
+from models import db, Users, Dish, Order, OrderItem, CartItem, Review
 from sockets import socketio, emit_order_status_update
 import os
+import uuid
+from supabase import create_client, Client
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 # Replace with a real secret key in your environment variables
@@ -17,13 +22,25 @@ app.config['SECRET_KEY'] = os.environ.get(
     'SECRET_KEY', 'a-secure-random-string-that-you-should-replace')
 app.config['ADMIN_CLAIM_CODE'] = os.environ.get(
     'ADMIN_CLAIM_CODE', '@hmed@zimi04')
-# Use Heroku's DATABASE_URL if available, otherwise fall back to local SQLite
-database_url = os.environ.get('DATABASE_URL')
-if not database_url:
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.abspath("instance/stitch_menu.db")}'
+# Use Supabase for database
+supabase_url = os.environ.get('SUPABASE_URL')
+supabase_anon_key = os.environ.get('SUPABASE_ANON_KEY')
+supabase_service_role_key = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+
+if supabase_url and supabase_anon_key:
+    supabase: Client = create_client(supabase_url, supabase_anon_key)
+    supabase_admin: Client = create_client(
+        supabase_url, supabase_service_role_key)
 else:
+    raise ValueError("Supabase credentials not found in environment variables")
+
+# Use Supabase PostgreSQL as primary, fall back to local SQLite if not available
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
     database_url = database_url.replace('postgres://', 'postgresql://')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.abspath("instance/stitch_menu.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 login_manager = LoginManager(app)
@@ -38,7 +55,7 @@ with app.app_context():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return Users.query.get(uuid.UUID(user_id))
 
 
 # Admin check decorator
@@ -168,7 +185,7 @@ def promote_all_users():
     admin_code = request.form.get('admin_code', '').strip()
     admin_code = ''.join(admin_code.split())  # Remove all spaces
     if admin_code.lower() == app.config.get('ADMIN_CLAIM_CODE').lower():
-        users = User.query.all()
+        users = Users.query.all()
         for user in users:
             user.is_admin = True
         db.session.commit()
@@ -193,35 +210,61 @@ def register():
         password = request.form['password']
         admin_code = request.form.get('admin_code', '').strip()
         admin_code = ''.join(admin_code.split())  # Remove all spaces
-        if User.query.filter((User.username == username) | (User.email == email)).first():
-            flash('Username or email already exists')
-            return redirect(url_for('register'))
-        hashed_password = generate_password_hash(password)
-        is_admin = admin_code.lower() == app.config.get('ADMIN_CLAIM_CODE').lower()
-        user = User(username=username, email=email,
-                    password=hashed_password, is_admin=is_admin)
-        db.session.add(user)
-        db.session.commit()
-        if is_admin:
-            flash(
-                'Registration successful! You have been registered as an admin. Please log in.')
-        else:
-            flash('Registration successful! Please log in.')
-        return redirect(url_for('login'))
+
+        # Check if user exists in Supabase Auth
+        try:
+            auth_response = supabase.auth.sign_up({
+                "email": email,
+                "password": password
+            })
+            if auth_response.user:
+                auth_user_id = auth_response.user.id
+                is_admin = admin_code.lower() == app.config.get('ADMIN_CLAIM_CODE').lower()
+                user = Users(username=username, email=email,
+                             password=None, is_admin=is_admin, auth_user_id=auth_user_id)
+                db.session.add(user)
+                db.session.commit()
+                if is_admin:
+                    flash(
+                        'Registration successful! You have been registered as an admin. Please log in.')
+                else:
+                    flash('Registration successful! Please log in.')
+                return redirect(url_for('login'))
+            else:
+                flash('Registration failed. Please try again.')
+        except Exception as e:
+            print(f"Supabase auth error: {e}")
+            # Check if it's a duplicate email error
+            if "already registered" in str(e).lower() or "already exists" in str(e).lower():
+                flash('Email already registered. Please try logging in instead.')
+            else:
+                flash('Registration failed. Please try again.')
     return render_template('register.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('home'))
-        else:
-            flash('Invalid credentials')
+        try:
+            auth_response = supabase.auth.sign_in_with_password({
+                "email": email,
+                "password": password
+            })
+            if auth_response.user:
+                user = Users.query.filter_by(
+                    auth_user_id=auth_response.user.id).first()
+                if user:
+                    login_user(user)
+                    return redirect(url_for('home'))
+                else:
+                    flash('User not found in database. Please register first.')
+            else:
+                flash('Invalid credentials')
+        except Exception as e:
+            print(f"Supabase auth error: {e}")
+            flash('Login failed. Please check your credentials.')
     return render_template('login.html')
 
 
@@ -470,17 +513,24 @@ def profile():
         email = request.form['email']
         password = request.form.get('password')
         # Check for unique username/email (ignore current user's own)
-        if User.query.filter(User.username == username, User.id != current_user.id).first():
+        if Users.query.filter(Users.username == username, Users.id != current_user.id).first():
             flash('Username already taken')
-        elif User.query.filter(User.email == email, User.id != current_user.id).first():
+        elif Users.query.filter(Users.email == email, Users.id != current_user.id).first():
             flash('Email already taken')
         else:
             current_user.username = username
             current_user.email = email
             if password:
-                current_user.password = generate_password_hash(password)
+                # Update password in Supabase Auth
+                try:
+                    supabase.auth.update_user({"password": password})
+                    flash('Profile updated!')
+                except Exception as e:
+                    print(f"Supabase password update error: {e}")
+                    flash('Profile updated but password change failed.')
+            else:
+                flash('Profile updated!')
             db.session.commit()
-            flash('Profile updated!')
         return redirect(url_for('profile'))
     return render_template('profile.html', user=current_user)
 
@@ -551,7 +601,7 @@ def seed():
 @app.cli.command('make_admin')
 def make_admin():
     with app.app_context():
-        user = User.query.first()
+        user = Users.query.first()
         if user:
             user.is_admin = True
             db.session.commit()

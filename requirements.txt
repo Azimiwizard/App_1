@@ -7,3 +7,5 @@ psycopg2-binary
 Flask-WTF
 Flask-SocketIO
 eventlet
+supabase
+python-dotenv

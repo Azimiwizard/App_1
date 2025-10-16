@@ -99,10 +99,10 @@
     </div>
 
     <nav id="navBar"
-        class="backdrop-blur-xs bg-glass dark:bg-glass-dark border-b border-gray-200 dark:border-gray-700 shadow-lg mb-6 animate-slide-up">
+        class="backdrop-blur-xs bg-glass dark:bg-gradient-to-r dark:from-primary dark:to-secondary border-b border-gray-200 dark:border-gray-700 shadow-lg mb-6 animate-slide-up">
         <div class="container mx-auto px-6">
             <div class="flex justify-between items-center py-4">
-                <a class="flex items-center text-2xl font-bold text-primary hover:scale-105 transition-transform duration-200"
+                <a class="flex items-center text-2xl font-bold text-primary dark:text-white hover:scale-105 transition-transform duration-200"
                     href="/">
                     <img src="{{ url_for('static', filename='logo.png') }}" alt="Stitch Menu Logo"
                         class="h-10 w-10 mr-3 rounded-full shadow-sm">
@@ -130,7 +130,8 @@
                     {% endif %}
                     <button id="themeToggle" title="Toggle dark/light mode"
                         class="focus:outline-none p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                        <span class="material-symbols-outlined text-text-dark dark:text-text-light">dark_mode</span>
+                        <span id="themeIcon"
+                            class="material-symbols-outlined text-text-dark dark:text-text-light">dark_mode</span>
                     </button>
                 </div>
                 <!-- Mobile Menu Button can be added here if needed -->
@@ -163,9 +164,23 @@
             htmlEl.classList.remove('dark');
         }
 
+        // Function to update theme icon
+        function updateThemeIcon() {
+            const themeIcon = document.getElementById('themeIcon');
+            if (htmlEl.classList.contains('dark')) {
+                themeIcon.textContent = 'light_mode';
+            } else {
+                themeIcon.textContent = 'dark_mode';
+            }
+        }
+
+        // Set initial icon
+        updateThemeIcon();
+
         themeToggle.addEventListener('click', () => {
             htmlEl.classList.toggle('dark');
             localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeIcon();
         });
 
         // Window controls for frameless desktop app

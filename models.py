@@ -1,71 +1,126 @@
+import uuid
+from sqlalchemy import (
+    Column,
+    String,
+    Text,
+    Boolean,
+    Integer,
+    Numeric,
+    TIMESTAMP,
+    ForeignKey,
+)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
-from flask import url_for
 
 db = SQLAlchemy()
 
 
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
-    points = db.Column(db.Integer, default=0)
-    reviews = db.relationship('Review', backref='author', lazy=True)
+class Users(db.Model):
+    __tablename__ = "users"
 
-    @property
-    def is_active(self):
-        return True
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # Maps to Supabase Auth user's UUID
+    auth_user_id = Column(String(36), unique=True,
+                          index=True, nullable=True)
+    username = Column(String(150), unique=True, nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    # Do NOT store plaintext passwords when using Supabase Auth.
+    # Keep a password field only if you manage auth yourself (not recommended).
+    password = Column(Text, nullable=True)
+    is_admin = Column(Boolean, default=False, nullable=False)
+    points = Column(Integer, default=0, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+    # relationships (optional convenience)
+    orders = relationship("Order", back_populates="user",
+                          cascade="all, delete-orphan")
+    cart_items = relationship(
+        "CartItem", back_populates="user", cascade="all, delete-orphan")
+    reviews = relationship("Review", back_populates="user",
+                           cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Users id={self.id} username={self.username} email={self.email}>"
 
 
 class Dish(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    description = db.Column(db.Text)
-    image_filename = db.Column(db.String(300))
-    section = db.Column(db.String(50), nullable=False, default='Other')
+    __tablename__ = "dish"
 
-    @property
-    def image_url(self):
-        if self.image_filename and self.image_filename.startswith('http'):
-            return self.image_filename
-        elif self.image_filename:
-            return '/static/uploads/' + self.image_filename
-        return '/static/logo.png'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(255), nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
+    description = Column(Text)
+    image_filename = Column(String(255))
+    section = Column(String(100))
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+    # relationships
+    order_items = relationship(
+        "OrderItem", back_populates="dish", cascade="all, delete-orphan")
+    reviews = relationship("Review", back_populates="dish",
+                           cascade="all, delete-orphan")
 
 
 class Order(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    phone_number = db.Column(db.String(20), nullable=True)
-    total = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(50), default='pending')
-    points_earned = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    __tablename__ = "order"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id", ondelete="CASCADE"), nullable=False)
+    phone_number = Column(String(50))
+    total = Column(Numeric(10, 2), nullable=False, default=0)
+    status = Column(String(50), nullable=False, default="pending")
+    points_earned = Column(Integer, default=0)
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+    user = relationship("Users", back_populates="orders")
+    order_items = relationship(
+        "OrderItem", back_populates="order", cascade="all, delete-orphan")
 
 
 class OrderItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
-    dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'))
-    quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float, nullable=False)
+    __tablename__ = "order_item"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    order_id = Column(UUID(as_uuid=True), ForeignKey(
+        "order.id", ondelete="CASCADE"), nullable=False)
+    dish_id = Column(UUID(as_uuid=True), ForeignKey(
+        "dish.id", ondelete="RESTRICT"), nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+    price = Column(Numeric(10, 2), nullable=False)
+    order = relationship("Order", back_populates="order_items")
+    dish = relationship("Dish", back_populates="order_items")
 
 
 class CartItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'))
-    quantity = db.Column(db.Integer, default=1)
+    __tablename__ = "cart_item"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id", ondelete="CASCADE"), nullable=False)
+    dish_id = Column(UUID(as_uuid=True), ForeignKey(
+        "dish.id", ondelete="RESTRICT"), nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+    user = relationship("Users", back_populates="cart_items")
+    dish = relationship("Dish")
 
 
 class Review(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', lazy=True)
-    dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'), nullable=False)
-    rating = db.Column(db.Integer, nullable=True)  # 1-5 or None
-    review_text = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    __tablename__ = "review"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id", ondelete="CASCADE"), nullable=False)
+    dish_id = Column(UUID(as_uuid=True), ForeignKey(
+        "dish.id", ondelete="CASCADE"), nullable=False)
+    # validate 1-5 at application layer or use CheckConstraint
+    rating = Column(Integer, nullable=False)
+    review_text = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+    user = relationship("Users", back_populates="reviews")
+    dish = relationship("Dish", back_populates="reviews")
