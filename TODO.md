@@ -1,8 +1,7 @@
-# TODO: Make Webview Desktop App Stylish
+# TODO: Update Dark Mode Colors from White to Light Gray
 
-## Tasks
-- [x] Update desktop_app.py to set frameless=True for borderless window
-- [x] Add custom title bar to templates/base.html with minimize, maximize, close buttons
-- [x] Enhance static/theme.css for title bar styles and desktop integration
-- [x] Update desktop_app.spec to include templates and static files for executable build
-- [x] Test the desktop app to ensure stylish view works
+## Steps to Complete
+- [x] Update --card-border in [data-bs-theme="dark"] from rgba(255, 255, 255, 0.1) to rgba(211, 211, 211, 0.1)
+- [x] Update --glass-border in [data-bs-theme="dark"] from rgba(255, 255, 255, 0.1) to rgba(211, 211, 211, 0.1)
+- [x] Update border-bottom in [data-bs-theme="dark"] .navbar from rgba(255, 255, 255, 0.1) to rgba(211, 211, 211, 0.1)
+- [x] Update background-color in #titleBar button:hover from rgba(255, 255, 255, 0.25) to rgba(211, 211, 211, 0.25)
