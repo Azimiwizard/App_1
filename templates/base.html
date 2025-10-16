@@ -179,16 +179,34 @@
             const maximizeBtn = document.getElementById('maximizeBtn');
             const closeBtn = document.getElementById('closeBtn');
 
+            let isMaximized = false;
+
+            // Update button states based on window state
+            function updateButtonStates() {
+                window.pywebview.api.get_window_state().then(state => {
+                    isMaximized = state.is_maximized;
+                    if (isMaximized) {
+                        maximizeBtn.style.display = 'none';
+                        restoreBtn.style.display = 'flex';
+                    } else {
+                        maximizeBtn.style.display = 'flex';
+                        restoreBtn.style.display = 'none';
+                    }
+                });
+            }
+
             minimizeBtn.addEventListener('click', () => {
                 window.pywebview.api.minimize();
             });
 
             restoreBtn.addEventListener('click', () => {
                 window.pywebview.api.restore();
+                setTimeout(updateButtonStates, 100);
             });
 
             maximizeBtn.addEventListener('click', () => {
                 window.pywebview.api.maximize();
+                setTimeout(updateButtonStates, 100);
             });
 
             closeBtn.addEventListener('click', () => {
@@ -200,6 +218,24 @@
                 if (e.target === titleBar || titleBar.contains(e.target)) {
                     window.pywebview.api.start_drag();
                 }
+            });
+
+            // Double-click title bar to maximize/restore
+            titleBar.addEventListener('dblclick', () => {
+                if (isMaximized) {
+                    window.pywebview.api.restore();
+                } else {
+                    window.pywebview.api.maximize();
+                }
+                setTimeout(updateButtonStates, 100);
+            });
+
+            // Initialize button states
+            updateButtonStates();
+
+            // Update button states on window resize (for manual resizing)
+            window.addEventListener('resize', () => {
+                setTimeout(updateButtonStates, 100);
             });
         }
     </script>

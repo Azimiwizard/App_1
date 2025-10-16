@@ -3,23 +3,52 @@ import threading
 import time
 import os
 import sys
+import json
 
 
 class Api:
+    def __init__(self):
+        self.is_maximized = False
+        self.previous_size = None
+        self.previous_position = None
+
     def minimize(self):
         webview.windows[0].minimize()
 
     def maximize(self):
-        webview.windows[0].maximize()
+        if not self.is_maximized:
+            # Store current size and position before maximizing
+            current_window = webview.windows[0]
+            self.previous_size = (current_window.width, current_window.height)
+            self.previous_position = (current_window.x, current_window.y)
+            current_window.maximize()
+            self.is_maximized = True
+        else:
+            self.restore()
 
     def restore(self):
-        webview.windows[0].restore()
+        if self.is_maximized and self.previous_size and self.previous_position:
+            current_window = webview.windows[0]
+            current_window.resize(*self.previous_size)
+            current_window.move(*self.previous_position)
+            self.is_maximized = False
 
     def close(self):
         webview.windows[0].destroy()
 
     def start_drag(self):
-        webview.windows[0].move(0, 0)
+        # This method is called when user starts dragging the title bar
+        pass
+
+    def get_window_state(self):
+        current_window = webview.windows[0]
+        return {
+            'is_maximized': self.is_maximized,
+            'width': current_window.width,
+            'height': current_window.height,
+            'x': current_window.x,
+            'y': current_window.y
+        }
 
 
 def run_flask_app():

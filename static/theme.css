@@ -125,15 +125,48 @@ body {
     -webkit-app-region: drag;
     user-select: none;
     height: 56px;
+    transition: all 0.2s ease-in-out;
+}
+
+#titleBar:hover {
+    backdrop-filter: blur(12px);
 }
 
 #titleBar button {
     -webkit-app-region: no-drag;
+    transition: all 0.15s ease;
+}
+
+#titleBar button:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+#titleBar button:active {
+    transform: scale(0.95);
 }
 
 body {
     padding-top: 56px;
     /* Account for fixed title bar */
+    transition: padding-top 0.2s ease-in-out;
+}
+
+/* Window animations */
+@keyframes windowFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+body {
+    animation: windowFadeIn 0.3s ease-out;
 }
 
 /* Enhanced desktop app styling */
@@ -146,4 +179,13 @@ body {
     body {
         padding-top: 0;
     }
+}
+
+/* Glassmorphism enhancements for desktop */
+#titleBar {
+    background: linear-gradient(135deg,
+            rgba(236, 127, 19, 0.95) 0%,
+            rgba(255, 107, 53, 0.95) 50%,
+            rgba(247, 147, 30, 0.95) 100%);
+    box-shadow: 0 4px 20px rgba(236, 127, 19, 0.3);
 }
