@@ -13,8 +13,8 @@
 }
 
 [data-bs-theme="dark"] {
-    --bs-body-bg: #0f0f0f;
-    --bs-body-color: #f8f9fa;
+    --bs-body-bg: #0f1419;
+    --bs-body-color: #385065;
     --primary: #ff8c42;
     --secondary: #ff6b35;
     --accent: #ffb366;
@@ -37,7 +37,7 @@
     background: linear-gradient(135deg, var(--accent), var(--primary));
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(236, 127, 19, 0.4);
-    color: #fff;
+    color: #ffffff;
 }
 
 .card {
@@ -81,11 +81,11 @@
 
 /* Additional modern styles */
 body {
-    background: linear-gradient(135deg, #fefefe 0%, #f5f5f5 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
 }
 
 [data-bs-theme="dark"] body {
-    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 30%, #2d2d2d 70%, #3a1a0a 100%);
+    background: linear-gradient(135deg, #0f1419 0%, #1a2e2a 30%, #2d4a3e 70%, #3a5a4a 100%);
 }
 
 .animate-fade-in {
