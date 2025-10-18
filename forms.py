@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, FloatField, TextAreaField, SelectField, SubmitField, RadioField
 from wtforms.validators import DataRequired, NumberRange, ValidationError, InputRequired
-from models import Dish
+from db import get_all_dishes
 
 
 class DishForm(FlaskForm):
@@ -22,7 +22,8 @@ class DishForm(FlaskForm):
     ], validators=[DataRequired()])
 
     def validate_name(self, field):
-        if Dish.query.filter_by(name=field.data).first():
+        dishes = get_all_dishes()
+        if any(dish['name'].lower() == field.data.lower() for dish in dishes):
             raise ValidationError('Dish name must be unique.')
 
 
