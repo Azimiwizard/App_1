@@ -10,4 +10,5 @@ Werkzeug==2.3.7
 WTForms==3.0.1
 Pillow==10.0.1
 pywebview==4.4.1
-gunicorn==21.2.0
+gunicorn
+gevent
