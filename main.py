@@ -21,7 +21,6 @@ app.config['SECRET_KEY'] = os.environ.get(
     'SECRET_KEY', '278b4e8f947ed0ce8f93dd410f5347b6100bf217566fe8d677c59764bde08f9c')
 app.config['ADMIN_CLAIM_CODE'] = os.environ.get(
     'ADMIN_CLAIM_CODE', '@hmed@zimi04')
-
 # Initialize Supabase clients
 supabase_url = os.environ.get('SUPABASE_URL')
 supabase_anon_key = os.environ.get('SUPABASE_ANON_KEY')
@@ -43,17 +42,14 @@ socketio.init_app(app, async_mode='eventlet')
 def load_user(user_id):
     user_data = get_user_by_id(user_id)
     if user_data:
-        # Create a simple user object for Flask-Login
-        class User:
+        # Create a user object for Flask-Login
+        class User(UserMixin):
             def __init__(self, data):
                 self.id = data['id']
                 self.username = data['username']
                 self.email = data['email']
                 self.is_admin = data['is_admin']
                 self.points = data['points']
-                self.is_authenticated = True
-                self.is_active = True
-                self.is_anonymous = False
 
             def get_id(self):
                 return str(self.id)
@@ -259,16 +255,17 @@ def register():
                         flash('Registration successful! Please log in.')
                     return redirect(url_for('login'))
                 else:
-                    flash('Registration failed. Please try again.')
+                    flash(
+                        'Account creation failed. Please contact support if this persists.')
             else:
-                flash('Registration failed. Please try again.')
+                flash('Authentication registration failed. Please try again.')
         except Exception as e:
             print(f"Supabase auth error: {e}")
             # Check if it's a duplicate email error
             if "already registered" in str(e).lower() or "already exists" in str(e).lower():
                 flash('Email already registered. Please try logging in instead.')
             else:
-                flash('Registration failed. Please try again.')
+                flash('Registration failed due to an error. Please try again.')
     return render_template('register.html')
 
 
@@ -286,16 +283,13 @@ def login():
                 user_data = get_user_by_auth_id(auth_response.user.id)
                 if user_data:
                     # Create user object for Flask-Login
-                    class User:
+                    class User(UserMixin):
                         def __init__(self, data):
                             self.id = data['id']
                             self.username = data['username']
                             self.email = data['email']
                             self.is_admin = data['is_admin']
                             self.points = data['points']
-                            self.is_authenticated = True
-                            self.is_active = True
-                            self.is_anonymous = False
 
                         def get_id(self):
                             return str(self.id)
