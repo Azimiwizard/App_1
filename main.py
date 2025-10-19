@@ -18,7 +18,7 @@ load_dotenv()
 app = Flask(__name__)
 # Replace with a real secret key in your environment variables
 app.config['SECRET_KEY'] = os.environ.get(
-    'SECRET_KEY', 'a-secure-random-string-that-you-should-replace')
+    'SECRET_KEY', '278b4e8f947ed0ce8f93dd410f5347b6100bf217566fe8d677c59764bde08f9c')
 app.config['ADMIN_CLAIM_CODE'] = os.environ.get(
     'ADMIN_CLAIM_CODE', '@hmed@zimi04')
 

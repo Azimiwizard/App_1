@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: stitch-daily-menu
+    env: python
+    buildCommand: "./render-build.sh"
+    startCommand: "gunicorn --worker-class eventlet --bind 0.0.0.0:$PORT main:app"
+    envVars:
+      - key: FLASK_APP
+        value: main.py
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
