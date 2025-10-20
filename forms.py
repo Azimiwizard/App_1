@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, FloatField, TextAreaField, SelectField, SubmitField, RadioField
-from wtforms.validators import DataRequired, NumberRange, ValidationError, InputRequired
-from db import get_all_dishes
+from wtforms import StringField, FloatField, TextAreaField, SelectField, SubmitField, RadioField, PasswordField
+from wtforms.validators import DataRequired, NumberRange, ValidationError, InputRequired, Email, Length
+from db import get_all_dishes, get_all_users
 
 
 class DishForm(FlaskForm):
@@ -37,3 +37,22 @@ class ReviewForm(FlaskForm):
     ])
     review_text = TextAreaField('Review (optional)')
     submit = SubmitField('Submit Review')
+
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[
+                           DataRequired(), Length(min=3, max=50)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[
+                             DataRequired(), Length(min=6)])
+    admin_code = PasswordField('Admin Code (Optional)')
+
+    def validate_username(self, field):
+        users = get_all_users()
+        if any(user['username'].lower() == field.data.lower() for user in users):
+            raise ValidationError('Username already taken.')
+
+    def validate_email(self, field):
+        users = get_all_users()
+        if any(user['email'].lower() == field.data.lower() for user in users):
+            raise ValidationError('Email already registered.')

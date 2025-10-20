@@ -5,7 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from flask_socketio import SocketIO
-from forms import DishForm, ReviewForm
+from flask_wtf import CSRFProtect
+from forms import DishForm, ReviewForm, RegisterForm
 from db import *
 from sockets import socketio, emit_order_status_update
 import os
@@ -18,9 +19,11 @@ load_dotenv()
 app = Flask(__name__)
 # Replace with a real secret key in your environment variables
 app.config['SECRET_KEY'] = os.environ.get(
-    'SECRET_KEY', '278b4e8f947ed0ce8f93dd410f5347b6100bf217566fe8d677c59764bde08f9c')
+    'SECRET_KEY') or 'dev-secret-key-change-in-production'
 app.config['ADMIN_CLAIM_CODE'] = os.environ.get(
     'ADMIN_CLAIM_CODE', '@hmed@zimi04')
+# Initialize CSRF protection
+csrf = CSRFProtect(app)
 # Initialize Supabase clients
 supabase_url = os.environ.get('SUPABASE_URL')
 supabase_anon_key = os.environ.get('SUPABASE_ANON_KEY')
@@ -224,18 +227,13 @@ def home():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        admin_code = request.form.get('admin_code', '').strip()
+    form = RegisterForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        admin_code = form.admin_code.data.strip() if form.admin_code.data else ''
         admin_code = ''.join(admin_code.split())  # Remove all spaces
-
-        # Check if user already exists in our database
-        existing_user = get_user_by_email(email)
-        if existing_user:
-            flash('Email already registered. Please try logging in instead.')
-            return redirect(url_for('register'))
 
         # Check if user exists in Supabase Auth
         try:
@@ -261,12 +259,19 @@ def register():
                 flash('Authentication registration failed. Please try again.')
         except Exception as e:
             print(f"Supabase auth error: {e}")
-            # Check if it's a duplicate email error
-            if "already registered" in str(e).lower() or "already exists" in str(e).lower():
+            error_msg = str(e).lower()
+            if "password" in error_msg and ("weak" in error_msg or "short" in error_msg):
+                flash(
+                    'Password is too weak. Please choose a stronger password (at least 6 characters).')
+            elif "email" in error_msg and ("invalid" in error_msg or "format" in error_msg):
+                flash('Invalid email format. Please enter a valid email address.')
+            elif "already registered" in error_msg or "already exists" in error_msg:
                 flash('Email already registered. Please try logging in instead.')
+            elif "network" in error_msg or "connection" in error_msg:
+                flash('Network error. Please check your connection and try again.')
             else:
                 flash('Registration failed due to an error. Please try again.')
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])

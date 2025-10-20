@@ -1,7 +1,9 @@
-# TODO: Update Dark Mode Colors from White to Light Gray
+# Fix Registration Error Plan
 
-## Steps to Complete
-- [x] Update --card-border in [data-bs-theme="dark"] from rgba(255, 255, 255, 0.1) to rgba(211, 211, 211, 0.1)
-- [x] Update --glass-border in [data-bs-theme="dark"] from rgba(255, 255, 255, 0.1) to rgba(211, 211, 211, 0.1)
-- [x] Update border-bottom in [data-bs-theme="dark"] .navbar from rgba(255, 255, 255, 0.1) to rgba(211, 211, 211, 0.1)
-- [x] Update background-color in #titleBar button:hover from rgba(255, 255, 255, 0.25) to rgba(211, 211, 211, 0.25)
+## Tasks
+- [x] Add RegisterForm class in forms.py with validators for username, email, password, admin_code
+- [x] Update register route in main.py to use RegisterForm and improve error handling
+- [x] Update templates/register.html to use form fields and display validation errors
+- [x] Test registration with invalid inputs (short password, invalid email)
+- [x] Test valid registration
+- [x] Check edge cases like network failures
