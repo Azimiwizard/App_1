@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, FloatField, TextAreaField, SelectField, SubmitField, RadioField, PasswordField
-from wtforms.validators import DataRequired, NumberRange, ValidationError, InputRequired, Email, Length
+from wtforms.validators import DataRequired, NumberRange, ValidationError, InputRequired, Regexp, Length
 from db import get_all_dishes, get_all_users
 
 
@@ -42,7 +42,8 @@ class ReviewForm(FlaskForm):
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[
                            DataRequired(), Length(min=3, max=50)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Regexp(
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', message='Invalid email address.')])
     password = PasswordField('Password', validators=[
                              DataRequired(), Length(min=6)])
     admin_code = PasswordField('Admin Code (Optional)')
