@@ -404,3 +404,135 @@ def calculate_review_stats(reviews: List[Dict[str, Any]]) -> Dict[str, Any]:
 
     avg_rating = sum(valid_ratings) / len(valid_ratings)
     return {'avg_rating': avg_rating, 'review_count': len(reviews)}
+
+
+# Revenue calculation functions
+
+def get_total_revenue() -> float:
+    """Get total revenue from all completed orders (delivered status)"""
+    try:
+        response = supabase.table(TABLE_ORDERS).select(
+            'total').eq('status', 'delivered').execute()
+        totals = [order['total'] for order in response.data]
+        return sum(totals)
+    except Exception as e:
+        print(f"Error getting total revenue: {e}")
+        return 0.0
+
+
+def get_revenue_by_date_range(start_date: str, end_date: str) -> float:
+    """Get revenue within a specific date range for completed orders"""
+    try:
+        response = supabase.table(TABLE_ORDERS).select('total').eq('status', 'delivered').gte(
+            'created_at', start_date).lte('created_at', end_date).execute()
+        totals = [order['total'] for order in response.data]
+        return sum(totals)
+    except Exception as e:
+        print(f"Error getting revenue by date range: {e}")
+        return 0.0
+
+
+def get_revenue_by_dish() -> List[Dict[str, Any]]:
+    """Get revenue breakdown by dish from completed orders"""
+    try:
+        # Get all order items from delivered orders with dish info
+        response = supabase.table(TABLE_ORDER_ITEMS).select(
+            'quantity, price, dish(name)').execute()
+
+        # Group by dish and calculate total revenue per dish
+        dish_revenue = {}
+        for item in response.data:
+            dish_name = item['dish']['name']
+            revenue = item['quantity'] * item['price']
+            if dish_name in dish_revenue:
+                dish_revenue[dish_name] += revenue
+            else:
+                dish_revenue[dish_name] = revenue
+
+        # Convert to list of dicts sorted by revenue descending
+        return [{'dish_name': name, 'revenue': revenue} for name, revenue in sorted(dish_revenue.items(), key=lambda x: x[1], reverse=True)]
+    except Exception as e:
+        print(f"Error getting revenue by dish: {e}")
+        return []
+
+
+def get_daily_revenue(days: int = 30) -> List[Dict[str, Any]]:
+    """Get daily revenue for the last N days from completed orders"""
+    try:
+        from datetime import datetime, timedelta
+
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+
+        response = supabase.table(TABLE_ORDERS).select('total, created_at').eq(
+            'status', 'delivered').gte('created_at', start_date.isoformat()).execute()
+
+        # Group by date
+        daily_totals = {}
+        for order in response.data:
+            date = order['created_at'][:10]  # Extract YYYY-MM-DD
+            if date in daily_totals:
+                daily_totals[date] += order['total']
+            else:
+                daily_totals[date] = order['total']
+
+        # Fill in missing dates with 0
+        result = []
+        current_date = start_date
+        while current_date <= end_date:
+            date_str = current_date.strftime('%Y-%m-%d')
+            result.append({
+                'date': date_str,
+                'revenue': daily_totals.get(date_str, 0.0)
+            })
+            current_date += timedelta(days=1)
+
+        return result
+    except Exception as e:
+        print(f"Error getting daily revenue: {e}")
+        return []
+
+
+def get_monthly_revenue(months: int = 12) -> List[Dict[str, Any]]:
+    """Get monthly revenue for the last N months from completed orders"""
+    try:
+        from datetime import datetime, timedelta
+
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=months*30)  # Approximate
+
+        response = supabase.table(TABLE_ORDERS).select('total, created_at').eq(
+            'status', 'delivered').gte('created_at', start_date.isoformat()).execute()
+
+        # Group by month
+        monthly_totals = {}
+        for order in response.data:
+            date = datetime.fromisoformat(
+                order['created_at'][:19])  # Parse datetime
+            month_key = f"{date.year}-{date.month:02d}"
+            if month_key in monthly_totals:
+                monthly_totals[month_key] += order['total']
+            else:
+                monthly_totals[month_key] = order['total']
+
+        # Fill in missing months with 0
+        result = []
+        current_date = start_date.replace(day=1)
+        while current_date <= end_date:
+            month_key = f"{current_date.year}-{current_date.month:02d}"
+            result.append({
+                'month': month_key,
+                'revenue': monthly_totals.get(month_key, 0.0)
+            })
+            # Move to next month
+            if current_date.month == 12:
+                current_date = current_date.replace(
+                    year=current_date.year + 1, month=1)
+            else:
+                current_date = current_date.replace(
+                    month=current_date.month + 1)
+
+        return result
+    except Exception as e:
+        print(f"Error getting monthly revenue: {e}")
+        return []

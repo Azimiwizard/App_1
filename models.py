@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from sqlalchemy import (
     Column,
     String,
@@ -12,9 +13,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from app.extensions import db
 
 
 class Users(db.Model):
@@ -40,6 +39,8 @@ class Users(db.Model):
         "CartItem", back_populates="user", cascade="all, delete-orphan")
     reviews = relationship("Review", back_populates="user",
                            cascade="all, delete-orphan")
+    # RBAC relation (many-to-many)
+    roles = relationship('Role', secondary='user_roles', backref='users')
 
     def __repr__(self):
         return f"<Users id={self.id} username={self.username} email={self.email}>"
@@ -124,3 +125,71 @@ class Review(db.Model):
                         server_default=func.now(), nullable=False)
     user = relationship("Users", back_populates="reviews")
     dish = relationship("Dish", back_populates="reviews")
+
+
+# RBAC models: roles, permissions, and association tables
+role_permissions = db.Table(
+    'role_permissions',
+    db.Column('role_id', UUID(as_uuid=True), db.ForeignKey(
+        'roles.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('permission_id', UUID(as_uuid=True), db.ForeignKey(
+        'permissions.id', ondelete='CASCADE'), primary_key=True),
+)
+
+user_roles = db.Table(
+    'user_roles',
+    db.Column('user_id', UUID(as_uuid=True), db.ForeignKey(
+        'users.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('role_id', UUID(as_uuid=True), db.ForeignKey(
+        'roles.id', ondelete='CASCADE'), primary_key=True),
+)
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(100), unique=True, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+
+    permissions = relationship(
+        'Permission', secondary=role_permissions, back_populates='roles')
+
+    def __repr__(self):
+        return f"<Role name={self.name}>"
+
+
+class Permission(db.Model):
+    __tablename__ = 'permissions'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    code = Column(String(150), unique=True, nullable=False)
+    description = Column(String(255))
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+
+    roles = relationship('Role', secondary=role_permissions,
+                         back_populates='permissions')
+
+    def __repr__(self):
+        return f"<Permission code={self.code}>"
+
+
+class AuditLog(db.Model):
+    __tablename__ = 'audit_logs'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    actor_id = Column(UUID(as_uuid=True), ForeignKey(
+        'users.id', ondelete='SET NULL'), nullable=True)
+    action = Column(String(100), nullable=False)
+    entity = Column(String(100), nullable=False)
+    entity_id = Column(String(100), nullable=True)
+    before_json = Column(Text)
+    after_json = Column(Text)
+    ip = Column(String(100))
+    user_agent = Column(String(500))
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=func.now(), nullable=False)
+
+    actor = relationship('Users')
+
+    def __repr__(self):
+        return f"<AuditLog id={self.id} action={self.action} entity={self.entity}>"

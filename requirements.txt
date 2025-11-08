@@ -16,3 +16,18 @@ gunicorn
 gevent
 Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.23
+Flask-Migrate==4.0.5
+Flask-Limiter==3.5.0
+pytest==7.4.3
+pytest-cov==4.1.0
+python-logging==0.4.9.6
+sentry-sdk==1.32.0
+flask-cors==4.0.0
+psycopg2-binary==2.9.10
+redis==4.7.0
+Flask-Caching==2.0.1
+passlib[argon2]==1.7.4
+prometheus-client==0.16.0
+limits[redis]==2.8.1
+redis_data:
+  name: stitch_redis_data

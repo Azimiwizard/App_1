@@ -42,8 +42,7 @@ class ReviewForm(FlaskForm):
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[
                            DataRequired(), Length(min=3, max=50)])
-    email = StringField('Email', validators=[DataRequired(), Regexp(
-        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', message='Invalid email address.')])
+    email = StringField('Email', validators=[DataRequired(), Regexp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', message='Invalid email address.')])
     password = PasswordField('Password', validators=[
                              DataRequired(), Length(min=6)])
     admin_code = PasswordField('Admin Code (Optional)')

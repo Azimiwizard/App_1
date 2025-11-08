@@ -1,22 +1,56 @@
+from cors_config import init_cors
+from security import init_security
+from models import *
 from functools import wraps
 from collections import defaultdict
-from flask import Flask, render_template, redirect, url_for, request, flash, Blueprint, session
+from flask import Flask, render_template, redirect, url_for, request, flash, Blueprint, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from flask_socketio import SocketIO
 from flask_wtf import CSRFProtect
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from forms import DishForm, ReviewForm, RegisterForm
 from db import *
 from sockets import socketio, emit_order_status_update
 import os
 import uuid
+import logging
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from logging_config import setup_logging, init_sentry
 
 load_dotenv()
 
 app = Flask(__name__)
+
+# Database configuration (use DATABASE_URL if provided, otherwise fallback to sqlite)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL', 'sqlite:///app.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Security configuration
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(32))
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file upload
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
+
+# Initialize security features
+init_security(app)
+
+# Initialize CORS (applies secure CORS config depending on environment)
+init_cors(app)
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# Import models after initializing SQLAlchemy
+
+# Set up logging
+setup_logging(app)
+
+# Initialize Sentry for production error tracking
+init_sentry(app)
 # Replace with a real secret key in your environment variables
 app.config['SECRET_KEY'] = os.environ.get(
     'SECRET_KEY') or 'dev-secret-key-change-in-production'
@@ -34,7 +68,11 @@ if supabase_url and supabase_anon_key:
     supabase_admin: Client = create_client(
         supabase_url, supabase_service_role_key)
 else:
-    raise ValueError("Supabase credentials not found in environment variables")
+    # Supabase is optional when using own Postgres (Docker). Log and continue.
+    supabase = None
+    supabase_admin = None
+    app.logger.info(
+        'Supabase not configured; proceeding without Supabase clients')
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -113,6 +151,7 @@ def admin_add_dish():
             section=form.section.data
         )
         if dish:
+
             flash('Dish added!')
             return redirect(url_for('admin_dashboard'))
         else:
@@ -195,6 +234,24 @@ def update_order_status(order_id, status):
     else:
         flash('Error updating order status')
     return redirect(url_for('admin_orders'))
+
+
+@app.route('/admin/revenue')
+@login_required
+@admin_required
+def admin_revenue():
+    from db import get_total_revenue, get_revenue_by_dish, get_daily_revenue, get_monthly_revenue
+
+    total_revenue = get_total_revenue()
+    dish_revenue = get_revenue_by_dish()
+    daily_revenue = get_daily_revenue(30)
+    monthly_revenue = get_monthly_revenue(12)
+
+    return render_template('admin_revenue.html',
+                           total_revenue=total_revenue,
+                           dish_revenue=dish_revenue,
+                           daily_revenue=daily_revenue,
+                           monthly_revenue=monthly_revenue)
 
 
 @app.route('/admin/promote_all', methods=['POST'])
@@ -655,8 +712,38 @@ def make_admin():
         user = users[0]
         update_user(user['id'], {'is_admin': True})
         print(f'User {user["username"]} is now an admin.')
-    else:
-        print('No user found. Please register first.')
+
+    # Initialize rate limiting
+    from rate_limiting import init_limiter, configure_route_limits
+    limiter = init_limiter(app)
+
+    # Configure rate limits for routes after all routes are defined
+    configure_route_limits(app, limiter)
+# Error handlers
+
+
+@app.errorhandler(404)
+def not_found_error(error):
+    app.logger.error(f'Page not found: {request.url}')
+    return render_template('errors/404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    app.logger.error(f'Server Error: {error}')
+    return render_template('errors/500.html'), 500
+
+
+@app.errorhandler(403)
+def forbidden_error(error):
+    app.logger.error(f'Forbidden access: {request.url}')
+    return render_template('errors/403.html'), 403
+
+
+@app.errorhandler(Exception)
+def unhandled_exception(error):
+    app.logger.error(f'Unhandled Exception: {error}')
+    return render_template('errors/500.html'), 500
 
 
 if __name__ == '__main__':
